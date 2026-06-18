@@ -1,31 +1,10 @@
 import { useState } from "react";
 import Head from "next/head";
 import { Geist } from "next/font/google";
+import StatusPanel from "@/components/StatusPanel";
+import type { VerifyResponse } from "@/components/StatusPanel";
 
 const geist = Geist({ subsets: ["latin"] });
-
-// ── Types ────────────────────────────────────────────────────────────────────
-
-type ClaimType =
-  | "tornado_touchdown"
-  | "siren_malfunction"
-  | "flooding"
-  | "power_outage"
-  | "other";
-
-type Verdict = "confirmed" | "unverified" | "contradicted";
-type Confidence = "high" | "medium" | "low";
-
-interface VerifyResponse {
-  claim_text: string;
-  extracted_location: string;
-  claim_type: ClaimType;
-  verdict: Verdict;
-  confidence: Confidence;
-  explanation: string;
-  sources: string[];
-  safety_disclaimer: string;
-}
 
 // ── Static mock state (matches shared JSON contract exactly) ─────────────────
 // Phase 4: replace with real POST /api/verify fetch result.
@@ -47,34 +26,6 @@ const MOCK_RESULT: VerifyResponse = {
     "⚠️ This is an AI-assisted analysis, not an official emergency broadcast. Always follow guidance from local emergency management and the National Weather Service.",
 };
 
-// ── Style maps ────────────────────────────────────────────────────────────────
-
-const VERDICT_STYLES: Record<Verdict, string> = {
-  confirmed: "border-emerald-500/60 shadow-emerald-500/10",
-  unverified: "border-amber-400/60 shadow-amber-400/10",
-  contradicted: "border-rose-500/60 shadow-rose-500/10",
-};
-
-const VERDICT_BADGE: Record<Verdict, string> = {
-  confirmed: "bg-emerald-500/20 text-emerald-300 ring-emerald-500/40",
-  unverified: "bg-amber-400/20 text-amber-300 ring-amber-400/40",
-  contradicted: "bg-rose-500/20 text-rose-300 ring-rose-500/40",
-};
-
-const CONFIDENCE_BADGE: Record<Confidence, string> = {
-  high: "bg-sky-500/20 text-sky-300 ring-sky-500/40",
-  medium: "bg-violet-500/20 text-violet-300 ring-violet-500/40",
-  low: "bg-slate-500/20 text-slate-300 ring-slate-500/40",
-};
-
-const CLAIM_LABEL: Record<ClaimType, string> = {
-  tornado_touchdown: "Tornado Touchdown",
-  siren_malfunction: "Siren Malfunction",
-  flooding: "Flooding",
-  power_outage: "Power Outage",
-  other: "Other",
-};
-
 // ── Example prompts for the DFW Block Leader persona ─────────────────────────
 
 const EXAMPLES = [
@@ -93,8 +44,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Phase 4: this will hit the real POST /api/verify endpoint.
-  // For now it simulates a network call and returns the mock result.
+  // Phase 4: swap the stub block below for the real fetch call.
   const handleSubmit = async () => {
     if (!inputText.trim()) return;
     setLoading(true);
@@ -102,7 +52,7 @@ export default function Home() {
     setResult(null);
 
     try {
-      // ── Swap this block in Phase 4 ──────────────────────────────────
+      // ── Uncomment in Phase 4 ────────────────────────────────────────
       // const res = await fetch("/api/verify", {
       //   method: "POST",
       //   headers: { "Content-Type": "application/json" },
@@ -129,8 +79,6 @@ export default function Home() {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit();
   };
 
-  const verdictStyle = result ? VERDICT_STYLES[result.verdict] : "";
-
   return (
     <>
       <Head>
@@ -154,7 +102,6 @@ export default function Home() {
                 <p className="text-xs text-slate-400">Emergency claim verification · North Texas</p>
               </div>
             </div>
-            {/* Live indicator */}
             <div className="flex items-center gap-2 text-xs text-slate-400">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -167,7 +114,7 @@ export default function Home() {
 
         <main className="mx-auto max-w-3xl px-6 py-10 space-y-8">
 
-          {/* ── Hero — DFW Block Leader persona ───────────────────────── */}
+          {/* ── Hero ──────────────────────────────────────────────────── */}
           <section aria-labelledby="hero-heading" className="space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-medium text-sky-400">
               <span>📡</span> Built for DFW Block Leaders &amp; Community Coordinators
@@ -187,8 +134,6 @@ export default function Home() {
               <span className="text-slate-300 font-medium">ERCOT grid</span>, and{" "}
               <span className="text-slate-300 font-medium">local PD feeds</span>.
             </p>
-
-            {/* Stat strip */}
             <div className="flex flex-wrap gap-4 pt-1">
               {[
                 { label: "Data Sources", value: "3 Live" },
@@ -209,15 +154,10 @@ export default function Home() {
             className="rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-md p-6 space-y-4"
           >
             <div className="flex items-center justify-between">
-              <label
-                htmlFor="claim-input"
-                className="text-sm font-semibold text-slate-200"
-              >
+              <label htmlFor="claim-input" className="text-sm font-semibold text-slate-200">
                 Enter the claim you heard
               </label>
-              <span className="text-xs text-slate-500">
-                {inputText.length} / 500
-              </span>
+              <span className="text-xs text-slate-500">{inputText.length} / 500</span>
             </div>
 
             <textarea
@@ -233,15 +173,12 @@ export default function Home() {
             />
 
             <p id="input-hint" className="text-xs text-slate-500">
-              Tip: Include location names, street intersections, or landmarks for
-              the most accurate result. Press{" "}
-              <kbd className="rounded bg-slate-700 px-1 py-0.5 font-mono text-slate-300">
-                ⌘ Enter
-              </kbd>{" "}
+              Tip: Include location names, street intersections, or landmarks for the most accurate
+              result. Press{" "}
+              <kbd className="rounded bg-slate-700 px-1 py-0.5 font-mono text-slate-300">⌘ Enter</kbd>{" "}
               to submit.
             </p>
 
-            {/* Quick-fill examples */}
             <div>
               <p className="text-xs text-slate-500 mb-2">Try an example:</p>
               <div className="flex flex-wrap gap-2">
@@ -258,7 +195,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Error state */}
             {error && (
               <div
                 role="alert"
@@ -278,23 +214,9 @@ export default function Home() {
               >
                 {loading ? (
                   <>
-                    <svg
-                      className="animate-spin h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12" cy="12" r="10"
-                        stroke="currentColor" strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v8H4z"
-                      />
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                     </svg>
                     Verifying…
                   </>
@@ -314,93 +236,9 @@ export default function Home() {
             </div>
           </section>
 
-          {/* ── Results panel (glassmorphic) ──────────────────────────── */}
-          {result && (
-            <section
-              aria-label="Verification result"
-              className={`rounded-2xl border bg-slate-900/50 backdrop-blur-md shadow-xl p-6 space-y-6 ${verdictStyle}`}
-            >
-              {/* Location + claim type row */}
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-slate-400 text-sm">
-                  📍 {result.extracted_location}
-                </span>
-                <span className="text-slate-600 text-xs hidden sm:inline">•</span>
-                <span className="rounded-full bg-slate-800 px-3 py-1 text-xs font-medium text-slate-300 ring-1 ring-slate-700">
-                  {CLAIM_LABEL[result.claim_type]}
-                </span>
-              </div>
+          {/* ── Glassmorphic status panel (Person 3 component) ───────── */}
+          {result && <StatusPanel result={result} />}
 
-              {/* Claim text */}
-              <blockquote className="border-l-2 border-slate-600 pl-4 italic text-slate-400 text-sm leading-relaxed">
-                &ldquo;{result.claim_text}&rdquo;
-              </blockquote>
-
-              {/* Verdict + confidence badges */}
-              <div className="flex flex-wrap items-center gap-3">
-                <span
-                  className={`rounded-full px-4 py-1.5 text-sm font-semibold ring-1 capitalize ${VERDICT_BADGE[result.verdict]}`}
-                  role="status"
-                  aria-label={`Verdict: ${result.verdict}`}
-                >
-                  {result.verdict}
-                </span>
-                <span
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium ring-1 capitalize ${CONFIDENCE_BADGE[result.confidence]}`}
-                  aria-label={`Confidence: ${result.confidence}`}
-                >
-                  {result.confidence} confidence
-                </span>
-              </div>
-
-              {/* Explanation */}
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">
-                  Analysis
-                </h3>
-                <p className="text-sm text-slate-300 leading-relaxed">
-                  {result.explanation}
-                </p>
-              </div>
-
-              {/* Sources */}
-              {result.sources.length > 0 && (
-                <div>
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">
-                    Sources
-                  </h3>
-                  <ul className="space-y-1">
-                    {result.sources.map((src) => (
-                      <li key={src}>
-                        <a
-                          href={src}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-sky-400 hover:text-sky-300 break-all underline underline-offset-2"
-                        >
-                          {src}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Persistent safety disclaimer */}
-              <div
-                role="alert"
-                aria-live="polite"
-                className="rounded-xl border border-amber-400/40 bg-amber-400/10 px-5 py-4"
-              >
-                <p className="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-1">
-                  Safety Notice
-                </p>
-                <p className="text-sm text-amber-200 leading-relaxed">
-                  {result.safety_disclaimer}
-                </p>
-              </div>
-            </section>
-          )}
         </main>
 
         {/* ── Footer ──────────────────────────────────────────────────── */}
