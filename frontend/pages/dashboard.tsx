@@ -202,26 +202,10 @@ export default function Dashboard() {
           <div className="mx-auto max-w-7xl px-8 py-4 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 group">
               <CloudLightningIcon className="w-5 h-5 text-sky-400 transition-opacity group-hover:opacity-70" />
-              <div>
-                <span className="text-sm font-semibold text-white" style={{ letterSpacing: "-0.01em" }}>
-                  VerifyDFW
-                </span>
-                <span className="hidden sm:inline text-slate-500 text-xs ml-2" style={{ letterSpacing: "0.02em" }}>
-                  Emergency Claim Verification
-                </span>
-              </div>
+              <span className="text-sm font-semibold text-white" style={{ letterSpacing: "-0.01em" }}>
+                VerifyDFW
+              </span>
             </Link>
-
-            {/* Live status — plain, no pill */}
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-              </span>
-              <span className="text-xs font-medium text-emerald-400" style={{ letterSpacing: "0.03em" }}>
-                NWS Live
-              </span>
-            </div>
           </div>
         </header>
 
@@ -468,77 +452,6 @@ export default function Dashboard() {
             </div>
 
           </div>
-
-          {/* Case study — full width */}
-          <section
-            aria-labelledby="case-study-heading"
-            className="mt-16 rounded-md overflow-hidden"
-            style={{
-              background: "rgba(10,15,30,0.7)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              backdropFilter: "blur(24px)",
-            }}
-          >
-
-            <div className="p-8 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-
-              <div className="space-y-2">
-                <p className="text-xs font-semibold text-rose-400 uppercase" style={{ letterSpacing: "0.14em" }}>
-                  Why This Matters
-                </p>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Source:{" "}
-                  <a
-                    href="https://people.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-rose-400 hover:text-rose-300 underline underline-offset-2"
-                  >
-                    People Magazine
-                  </a>
-                  , December 2024
-                </p>
-              </div>
-
-              <div className="md:col-span-2 space-y-4">
-                <h3
-                  id="case-study-heading"
-                  className="text-xl font-bold text-white leading-snug"
-                  style={{ letterSpacing: "-0.02em" }}
-                >
-                  A single unverified rumor can cost a life.
-                </h3>
-
-                <p className="text-slate-300 text-sm leading-relaxed font-light">
-                  In 2024, <strong className="text-white font-semibold">Jamie Brown, 46</strong>, was
-                  killed when a tornado destroyed her home in Texas. During severe weather events, false
-                  social media rumors can cause people to ignore official warnings or delay seeking
-                  shelter — with fatal consequences.
-                </p>
-
-                <blockquote
-                  className="pl-4 border-l-2 border-rose-500/60"
-                >
-                  <p className="text-sm text-rose-200/80 italic leading-relaxed font-light">
-                    "An AI weather-verification tool could help users quickly determine whether weather
-                    claims are true before making potentially life-saving decisions."
-                  </p>
-                </blockquote>
-
-                <p className="text-slate-400 text-sm leading-relaxed font-light">
-                  With <strong className="text-white font-medium">VerifyDFW</strong>, block leaders
-                  and community coordinators can clear up dangerous misconceptions in seconds —
-                  cross-referencing live NWS, ERCOT, and local PD data before a rumor spreads further.
-                </p>
-
-                <div className="flex gap-6 pt-1 text-xs text-slate-500" style={{ letterSpacing: "0.02em" }}>
-                  <span className="text-rose-400/80">Misinformation saves no one.</span>
-                  <span className="text-emerald-400/80">Verify before you share.</span>
-                </div>
-              </div>
-
-            </div>
-          </section>
 
         </main>
 
