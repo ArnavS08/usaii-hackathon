@@ -1,13 +1,4 @@
-// ── StatusPanel — Person 3 (Phase 3, Task 2) ────────────────────────────────
-// Glassmorphic results card that dynamically shifts its border and glow color
-// based on the verdict classification tier: confirmed / unverified / contradicted.
-//
-// Person 4's job: replace the <DisclaimerBanner /> placeholder at the bottom
-// of this component with the real DisclaimerBanner component they build.
-
 import DisclaimerBanner from "./DisclaimerBanner";
-
-// ── Types (shared contract) ───────────────────────────────────────────────────
 
 export type ClaimType =
   | "tornado_touchdown"
@@ -30,119 +21,102 @@ export interface VerifyResponse {
   safety_disclaimer: string;
 }
 
-// ── Style maps (verdict tier → visual treatment) ──────────────────────────────
-
 const VERDICT_BORDER: Record<Verdict, string> = {
-  confirmed: "border-emerald-500/60 shadow-emerald-500/10",
-  unverified: "border-amber-400/60 shadow-amber-400/10",
-  contradicted: "border-rose-500/60 shadow-rose-500/10",
+  confirmed: "border-emerald-500/40",
+  unverified: "border-amber-400/40",
+  contradicted: "border-rose-500/40",
 };
 
-const VERDICT_GLOW: Record<Verdict, string> = {
-  confirmed: "shadow-[0_0_40px_-8px_rgba(16,185,129,0.25)]",
-  unverified: "shadow-[0_0_40px_-8px_rgba(251,191,36,0.2)]",
-  contradicted: "shadow-[0_0_40px_-8px_rgba(239,68,68,0.25)]",
+const VERDICT_DOT: Record<Verdict, string> = {
+  confirmed: "bg-emerald-500",
+  unverified: "bg-amber-400",
+  contradicted: "bg-rose-500",
 };
 
-const VERDICT_BADGE: Record<Verdict, string> = {
-  confirmed: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40",
-  unverified: "bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/40",
-  contradicted: "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/40",
+const VERDICT_TEXT: Record<Verdict, string> = {
+  confirmed: "text-emerald-400",
+  unverified: "text-amber-400",
+  contradicted: "text-rose-400",
 };
 
-const VERDICT_ICON: Record<Verdict, string> = {
-  confirmed: "✅",
-  unverified: "⚠️",
-  contradicted: "🚫",
-};
-
-const CONFIDENCE_BADGE: Record<Confidence, string> = {
-  high: "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/40",
-  medium: "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/40",
-  low: "bg-slate-500/20 text-slate-300 ring-1 ring-slate-500/40",
+const CONFIDENCE_TEXT: Record<Confidence, string> = {
+  high: "text-sky-400",
+  medium: "text-violet-400",
+  low: "text-slate-400",
 };
 
 const CLAIM_LABEL: Record<ClaimType, string> = {
-  tornado_touchdown: "🌪️ Tornado Touchdown",
-  siren_malfunction: "🔊 Siren Malfunction",
-  flooding: "🌊 Flooding",
-  power_outage: "⚡ Power Outage",
-  other: "📋 Other",
+  tornado_touchdown: "Tornado Touchdown",
+  siren_malfunction: "Siren Malfunction",
+  flooding: "Flooding",
+  power_outage: "Power Outage",
+  other: "Other",
 };
-
-// ── Component ─────────────────────────────────────────────────────────────────
 
 interface StatusPanelProps {
   result: VerifyResponse;
 }
 
 export default function StatusPanel({ result }: StatusPanelProps) {
-  const borderClass = VERDICT_BORDER[result.verdict];
-  const glowClass = VERDICT_GLOW[result.verdict];
-
   return (
     <section
       aria-label="Verification result"
-      className={`rounded-2xl border bg-slate-900/50 backdrop-blur-md p-6 space-y-6 transition-all duration-500 ${borderClass} ${glowClass}`}
+      className={`rounded-md border p-6 space-y-5 ${VERDICT_BORDER[result.verdict]}`}
+      style={{ background: "rgba(10,15,30,0.65)", backdropFilter: "blur(24px)" }}
     >
-      {/* ── Panel header: location + claim type ───────────────────────── */}
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="text-slate-400 text-sm font-medium">
-          📍 {result.extracted_location}
-        </span>
-        <span className="text-slate-600 text-xs hidden sm:inline">•</span>
-        <span className="rounded-full bg-slate-800 px-3 py-1 text-xs font-medium text-slate-300 ring-1 ring-slate-700">
-          {CLAIM_LABEL[result.claim_type]}
-        </span>
+      {/* Location + claim type */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500" style={{ letterSpacing: "0.02em" }}>
+        <span>{result.extracted_location}</span>
+        <span>·</span>
+        <span>{CLAIM_LABEL[result.claim_type]}</span>
       </div>
 
-      {/* ── Original claim text ────────────────────────────────────────── */}
-      <blockquote className="border-l-2 border-slate-600 pl-4 italic text-slate-400 text-sm leading-relaxed">
+      {/* Original claim */}
+      <blockquote className="border-l-2 border-slate-700 pl-4 text-slate-400 text-sm leading-relaxed italic font-light">
         &ldquo;{result.claim_text}&rdquo;
       </blockquote>
 
-      {/* ── Verdict + confidence tier badges ──────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-3">
+      {/* Verdict + confidence */}
+      <div className="flex items-center gap-5">
+        <div className="flex items-center gap-2" role="status" aria-label={`Verdict: ${result.verdict}`}>
+          <span className={`inline-block w-2 h-2 rounded-full ${VERDICT_DOT[result.verdict]}`} />
+          <span className={`text-sm font-semibold capitalize ${VERDICT_TEXT[result.verdict]}`}>
+            {result.verdict}
+          </span>
+        </div>
+        <span className="text-slate-700 text-xs">|</span>
         <span
-          className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize flex items-center gap-1.5 ${VERDICT_BADGE[result.verdict]}`}
-          role="status"
-          aria-label={`Verdict: ${result.verdict}`}
-        >
-          {VERDICT_ICON[result.verdict]} {result.verdict}
-        </span>
-        <span
-          className={`rounded-full px-4 py-1.5 text-sm font-medium capitalize ${CONFIDENCE_BADGE[result.confidence]}`}
+          className={`text-xs font-medium capitalize ${CONFIDENCE_TEXT[result.confidence]}`}
           aria-label={`Confidence: ${result.confidence}`}
+          style={{ letterSpacing: "0.02em" }}
         >
           {result.confidence} confidence
         </span>
       </div>
 
-      {/* ── Analysis explanation ───────────────────────────────────────── */}
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">
+      {/* Analysis */}
+      <div className="space-y-1.5">
+        <p className="text-xs font-semibold text-slate-500 uppercase" style={{ letterSpacing: "0.1em" }}>
           Analysis
-        </h3>
-        <p className="text-sm text-slate-300 leading-relaxed">
-          {result.explanation}
         </p>
+        <p className="text-sm text-slate-300 leading-relaxed font-light">{result.explanation}</p>
       </div>
 
-      {/* ── Sources list ───────────────────────────────────────────────── */}
+      {/* Sources */}
       {result.sources.length > 0 && (
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold text-slate-500 uppercase" style={{ letterSpacing: "0.1em" }}>
             Sources Checked
-          </h3>
+          </p>
           <ul className="space-y-1">
             {result.sources.map((src) => (
-              <li key={src} className="flex items-start gap-1.5">
-                <span className="text-slate-600 mt-0.5 text-xs">→</span>
+              <li key={src} className="flex items-start gap-2">
+                <span className="text-slate-600 mt-0.5 text-xs select-none">→</span>
                 <a
                   href={src}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-sky-400 hover:text-sky-300 break-all underline underline-offset-2 transition-colors"
+                  className="text-xs text-sky-400 hover:text-sky-300 break-all underline underline-offset-2 transition-colors font-light"
                 >
                   {src}
                 </a>
@@ -152,11 +126,7 @@ export default function StatusPanel({ result }: StatusPanelProps) {
         </div>
       )}
 
-      {/* ── Disclaimer — Person 4 builds DisclaimerBanner.tsx ─────────── */}
-      <DisclaimerBanner
-        message={result.safety_disclaimer}
-        verdict={result.verdict}
-      />
+      <DisclaimerBanner message={result.safety_disclaimer} verdict={result.verdict} />
     </section>
   );
 }
